@@ -238,71 +238,7 @@
             font-style: italic;
         }
 
-        .music-control {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 107, 157, 0.9);
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            opacity: 0;
-            animation: fadeInUp 1s ease-out 3s forwards;
-        }
 
-        .music-control:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.6);
-        }
-
-        .music-control:active {
-            transform: scale(0.95);
-        }
-
-        .music-icon {
-            color: white;
-            font-size: 1.2rem;
-        }
-
-        .music-control.playing {
-            background: rgba(76, 175, 80, 0.9);
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
-        }
-
-        .music-control.playing:hover {
-            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
-        }
-
-        .progress-bar {
-            width: 80%;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 2px;
-            margin: 20px 0;
-            overflow: hidden;
-            opacity: 0;
-            animation: fadeInUp 1s ease-out 2s forwards;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(45deg, #ff6b9d, #ff8a80);
-            border-radius: 2px;
-            animation: progressLoop 14s infinite linear;
-        }
-
-        @keyframes progressLoop {
-            0% { width: 0%; }
-            100% { width: 100%; }
-        }
 
         .subtitle {
             color: rgba(255, 255, 255, 0.8);
@@ -341,15 +277,10 @@
     <div class="floating-hearts"></div>
     
     <!-- 音乐播放器 -->
-    <audio id="bgMusic" loop>
+    <audio id="bgMusic" loop autoplay>
         <source src="童话.mp3" type="audio/mpeg">
         您的浏览器不支持音频播放。
     </audio>
-    
-    <!-- 音乐控制按钮 -->
-    <button class="music-control" id="musicBtn">
-        <span class="music-icon">🎵</span>
-    </button>
     
     <div class="container">
         <h1 class="title">
@@ -405,10 +336,6 @@
                 </div>
             </div>
             <div class="timer-subtitle">从2025年6月22日开始的美好时光</div>
-        </div>
-        
-        <div class="progress-bar">
-            <div class="progress-fill"></div>
         </div>
         
         <p class="subtitle">在繁华世界中，我只想与你相依相伴</p>
@@ -481,7 +408,7 @@
         // 自动开始轮播
         function startAutoSlideshow() {
             slideshow.classList.add('active');
-            slideInterval = setInterval(nextSlide, 2000);
+            slideInterval = setInterval(nextSlide, 5000);
         }
 
         // 动态更换爱情语录
@@ -539,59 +466,30 @@
         // 音乐播放控制
         function initMusicPlayer() {
             const music = document.getElementById('bgMusic');
-            const musicBtn = document.getElementById('musicBtn');
-            const musicIcon = musicBtn.querySelector('.music-icon');
-            let isPlaying = false;
             
-            // 设置音量
-            music.volume = 0.3;
+            // 设置音量为50%
+            music.volume = 0.5;
             
-            function playMusic() {
-                music.play().then(() => {
-                    isPlaying = true;
-                    musicBtn.classList.add('playing');
-                    musicIcon.textContent = '🎵';
-                }).catch(error => {
-                    console.log('音乐播放失败：', error);
+            // 尝试自动播放
+            function attemptAutoPlay() {
+                music.play().catch(error => {
+                    console.log('自动播放失败，等待用户交互：', error);
+                    // 如果自动播放失败，在用户首次交互后播放
+                    document.addEventListener('click', () => {
+                        music.play();
+                    }, { once: true });
+                    document.addEventListener('touchstart', () => {
+                        music.play();
+                    }, { once: true });
                 });
             }
             
-            function pauseMusic() {
-                music.pause();
-                isPlaying = false;
-                musicBtn.classList.remove('playing');
-                musicIcon.textContent = '🎵';
-            }
-            
-            // 音乐按钮点击事件
-            musicBtn.addEventListener('click', function() {
-                if (isPlaying) {
-                    pauseMusic();
-                } else {
-                    playMusic();
-                }
-            });
-            
-            // 尝试在页面交互后自动播放
-            let autoPlayAttempted = false;
-            function attemptAutoPlay() {
-                if (!autoPlayAttempted) {
-                    autoPlayAttempted = true;
-                    playMusic();
-                }
-            }
-            
-            // 监听首次用户交互
-            document.addEventListener('click', attemptAutoPlay, { once: true });
-            document.addEventListener('touchstart', attemptAutoPlay, { once: true });
+            // 立即尝试播放
+            attemptAutoPlay();
         }
 
         // 防止移动端意外操作
         document.addEventListener('touchstart', function(e) {
-            // 允许音乐按钮的点击
-            if (e.target.closest('.music-control')) {
-                return;
-            }
             e.preventDefault();
         }, { passive: false });
 
