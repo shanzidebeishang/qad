@@ -181,6 +181,106 @@
             letter-spacing: 1px;
         }
 
+        .love-timer {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 25px 0;
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 1.8s forwards;
+        }
+
+        .timer-title {
+            color: #ff6b9d;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .timer-display {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .timer-item {
+            background: rgba(255, 107, 157, 0.2);
+            border-radius: 8px;
+            padding: 8px 4px;
+            text-align: center;
+        }
+
+        .timer-number {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: block;
+            line-height: 1;
+        }
+
+        .timer-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.7rem;
+            margin-top: 2px;
+            display: block;
+        }
+
+        .timer-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.75rem;
+            font-style: italic;
+        }
+
+        .music-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 107, 157, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 3s forwards;
+        }
+
+        .music-control:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.6);
+        }
+
+        .music-control:active {
+            transform: scale(0.95);
+        }
+
+        .music-icon {
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .music-control.playing {
+            background: rgba(76, 175, 80, 0.9);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .music-control.playing:hover {
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
+        }
+
         .progress-bar {
             width: 80%;
             height: 3px;
@@ -240,6 +340,17 @@
     <div class="stars"></div>
     <div class="floating-hearts"></div>
     
+    <!-- 音乐播放器 -->
+    <audio id="bgMusic" loop>
+        <source src="童话.mp3" type="audio/mpeg">
+        您的浏览器不支持音频播放。
+    </audio>
+    
+    <!-- 音乐控制按钮 -->
+    <button class="music-control" id="musicBtn">
+        <span class="music-icon">🎵</span>
+    </button>
+    
     <div class="container">
         <h1 class="title">
             伏颜珏<span class="heart">♡</span>彭睿璇
@@ -271,6 +382,29 @@
             <div class="slide">
                 <img src="2a582874f080d316a91620141727016.jpg" alt="美好回忆">
             </div>
+        </div>
+        
+        <div class="love-timer">
+            <div class="timer-title">💕 我们相爱的时光 💕</div>
+            <div class="timer-display">
+                <div class="timer-item">
+                    <span class="timer-number" id="days">0</span>
+                    <span class="timer-label">天</span>
+                </div>
+                <div class="timer-item">
+                    <span class="timer-number" id="hours">0</span>
+                    <span class="timer-label">时</span>
+                </div>
+                <div class="timer-item">
+                    <span class="timer-number" id="minutes">0</span>
+                    <span class="timer-label">分</span>
+                </div>
+                <div class="timer-item">
+                    <span class="timer-number" id="seconds">0</span>
+                    <span class="timer-label">秒</span>
+                </div>
+            </div>
+            <div class="timer-subtitle">从2025年6月22日开始的美好时光</div>
         </div>
         
         <div class="progress-bar">
@@ -373,8 +507,91 @@
             }, 4000);
         }
 
+        // 爱情计时器功能
+        function initLoveTimer() {
+            // 设置恋爱开始时间：2025年6月22日 00:00:00
+            const startDate = new Date('2025-06-22T00:00:00').getTime();
+            
+            function updateTimer() {
+                const now = new Date().getTime();
+                const timeDifference = now - startDate;
+                
+                // 计算天、时、分、秒
+                const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+                
+                // 更新显示
+                document.getElementById('days').textContent = days;
+                document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+                document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            }
+            
+            // 立即更新一次
+            updateTimer();
+            
+            // 每秒更新一次
+            setInterval(updateTimer, 1000);
+        }
+
+        // 音乐播放控制
+        function initMusicPlayer() {
+            const music = document.getElementById('bgMusic');
+            const musicBtn = document.getElementById('musicBtn');
+            const musicIcon = musicBtn.querySelector('.music-icon');
+            let isPlaying = false;
+            
+            // 设置音量
+            music.volume = 0.3;
+            
+            function playMusic() {
+                music.play().then(() => {
+                    isPlaying = true;
+                    musicBtn.classList.add('playing');
+                    musicIcon.textContent = '🎵';
+                }).catch(error => {
+                    console.log('音乐播放失败：', error);
+                });
+            }
+            
+            function pauseMusic() {
+                music.pause();
+                isPlaying = false;
+                musicBtn.classList.remove('playing');
+                musicIcon.textContent = '🎵';
+            }
+            
+            // 音乐按钮点击事件
+            musicBtn.addEventListener('click', function() {
+                if (isPlaying) {
+                    pauseMusic();
+                } else {
+                    playMusic();
+                }
+            });
+            
+            // 尝试在页面交互后自动播放
+            let autoPlayAttempted = false;
+            function attemptAutoPlay() {
+                if (!autoPlayAttempted) {
+                    autoPlayAttempted = true;
+                    playMusic();
+                }
+            }
+            
+            // 监听首次用户交互
+            document.addEventListener('click', attemptAutoPlay, { once: true });
+            document.addEventListener('touchstart', attemptAutoPlay, { once: true });
+        }
+
         // 防止移动端意外操作
         document.addEventListener('touchstart', function(e) {
+            // 允许音乐按钮的点击
+            if (e.target.closest('.music-control')) {
+                return;
+            }
             e.preventDefault();
         }, { passive: false });
 
@@ -395,6 +612,8 @@
             setTimeout(() => {
                 startAutoSlideshow();
                 changeQuote();
+                initLoveTimer();
+                initMusicPlayer();
             }, 2000);
         });
     </script>
